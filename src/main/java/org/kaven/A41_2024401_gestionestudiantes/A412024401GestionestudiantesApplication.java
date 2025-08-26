@@ -1,6 +1,9 @@
 package org.kaven.A41_2024401_gestionestudiantes;
 
+import org.kaven.A41_2024401_gestionestudiantes.Dominio.Service.CursosService;
+import org.kaven.A41_2024401_gestionestudiantes.Dominio.Service.ICursosService;
 import org.kaven.A41_2024401_gestionestudiantes.Dominio.Service.IEstudianteService;
+import org.kaven.A41_2024401_gestionestudiantes.persistence.entity.Cursos;
 import org.kaven.A41_2024401_gestionestudiantes.persistence.entity.Estudiantes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
 
 import java.util.List;
 import java.util.Scanner;
@@ -51,7 +53,8 @@ public class A412024401GestionestudiantesApplication implements CommandLineRunne
                 3. Agregar nuevo Estudiantes.
                 4. Modificar los datos de Estudiantes.
                 5. Dar de baja a Estudiante.
-                6. Salir.
+                6. Mostar notas de los Cursos de estudiantes.
+                7. Salir.
                 Elija una opcion: \s""");
 		var opcion = Integer.parseInt(consola.nextLine());
 		return opcion;
@@ -102,11 +105,14 @@ public class A412024401GestionestudiantesApplication implements CommandLineRunne
 				var apellido = consola.nextLine();
 				logger.info("Ingrese el correo: ");
 				var correo = consola.nextLine();
+				logger.info("Ingrese nombre del curso para inscribirse");
+				var inscrito = consola.nextLine();
 
 				var estudiante = new Estudiantes();
 				estudiante.setNombre(nombre);
 				estudiante.setApellido(apellido);
 				estudiante.setCorreo(correo);
+				estudiante.setInscrito(inscrito);
 				estudianteService.guardarEstudiantes(estudiante);
 				logger.info("Estudiante agregado: " + sl + estudiante + sl);
 			}
@@ -122,10 +128,13 @@ public class A412024401GestionestudiantesApplication implements CommandLineRunne
 					var apellido = consola.nextLine();
 					logger.info("Ingrese el correo: ");
 					var correo = consola.nextLine();
+					logger.info("Ingrese el nuevo curso que quiere Inscribirse: ");
+					var inscrito = consola.nextLine();
 
 					estudiante.setNombre(nombre);
 					estudiante.setApellido(apellido);
 					estudiante.setCorreo(correo);
+					estudiante.setInscrito(inscrito);
 					estudianteService.guardarEstudiantes(estudiante);
 					logger.info("Estudiante modificado: " + sl + estudiante + sl);
 				}else{
@@ -145,7 +154,12 @@ public class A412024401GestionestudiantesApplication implements CommandLineRunne
 					logger.info("Estudiantes no encontrado"+ sl + estudiante + sl);
 				}
 			}
-			case 6 -> {
+			case 6 ->{
+				logger.info("***Mostar notas de los Cursos de estudiantes.***");
+				List<Cursos> cursos = cursosService.listarCursos();
+				cursos.forEach(cursos -> logger.info(cursos.toString()+sl));
+			}
+			case 7 -> {
 				logger.info(sl+"***Salir del programa***"+sl);
 				salir = true;
 			}
