@@ -46,7 +46,7 @@ public class A412024401GestionestudiantesApplication implements CommandLineRunne
 	private int mostrarMenu(Scanner consola) {
 		logger.info("""
                 \n***Aplicacion***
-                1. Listar todos los Estudiantes.
+                1. Listado de todos los estudiantes.
                 2. Buscar Estudiantes por codigo.
                 3. Agregar nuevo Estudiantes.
                 4. Modificar los datos de Estudiantes.
