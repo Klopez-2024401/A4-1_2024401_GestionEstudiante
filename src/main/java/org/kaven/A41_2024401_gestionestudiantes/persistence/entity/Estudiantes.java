@@ -1,10 +1,12 @@
-package org.kaven.A41_2024401_gestionestudiantes.persistence.entity.entity;
+package org.kaven.A41_2024401_gestionestudiantes.persistence.entity;
 
 
 import jakarta.persistence.*;
 import lombok.*;
 
-@Entity(name = "Esutidantes")
+
+@Entity
+@Table(name = "Estudiantes")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -15,10 +17,13 @@ public class Estudiantes {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer IdEstudiantes;
-    @Column
+    @Column(name = "idestudiantes")
+    private Integer idestudiantes;
+    @Column(name = "nombre")
     private String nombre;
+    @Column(name = "apellido")
     private String apellido;
+    @Column(name = "correo")
     private String correo;
 }
 
