@@ -16,7 +16,7 @@ create table Cursos(
     constraint pk_cursos primary key(idcursos)
 );
 
-create table EstudianteCurso(
+create table Estudiantecurso(
 	idestudiantes int,
     idcursos int,
     nota decimal(5,2),

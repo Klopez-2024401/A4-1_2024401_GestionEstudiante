@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface EstudiantesCursoCrud extends JpaRepository<EstudiantesCurso, EstudianteCursoId>{
-    List<EstudiantesCurso> findByEstudianteId(Integer idEstudiante);
-    List<EstudiantesCurso> findByEstudianteCorreo(String correo);
+    List<EstudiantesCurso> findByEstudiante_Idestudiantes(Integer idEstudiantes);
+    List<EstudiantesCurso> findByEstudiante_Correo(String correo);
+
+
 }

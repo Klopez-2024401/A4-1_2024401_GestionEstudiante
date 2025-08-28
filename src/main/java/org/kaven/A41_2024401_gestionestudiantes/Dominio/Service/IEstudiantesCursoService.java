@@ -6,6 +6,7 @@ import java.util.List;
 
 public interface IEstudiantesCursoService {
     List<EstudiantesCurso> listarEstudiantesCurso();
-    EstudiantesCurso buscarPorEstudianteId(Integer codigo);
-    EstudiantesCurso buscarPorEstudianteCorreo(String correo);
+    List<EstudiantesCurso> buscarPorEstudianteId(Integer codigo);
+    List<EstudiantesCurso> buscarPorEstudianteCorreo(String correo);
+    EstudiantesCurso guardarEstudiantesCurso(EstudiantesCurso estCurso);
 }

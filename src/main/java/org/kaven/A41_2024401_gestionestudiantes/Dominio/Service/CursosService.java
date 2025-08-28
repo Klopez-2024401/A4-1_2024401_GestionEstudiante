@@ -29,4 +29,11 @@ public class CursosService implements ICursosService{
     public List<Cursos> listarCursos() {
         return crud.findAll();
     }
+
+    @Override
+    public Cursos buscarCurso(Integer idCurso) {
+        return crud.findById(idCurso).orElse(null);
+    }
+
+
 }

@@ -5,6 +5,7 @@ import org.kaven.A41_2024401_gestionestudiantes.Dominio.Service.IEstudianteServi
 import org.kaven.A41_2024401_gestionestudiantes.Dominio.Service.IEstudiantesCursoService;
 import org.kaven.A41_2024401_gestionestudiantes.persistence.entity.Cursos;
 import org.kaven.A41_2024401_gestionestudiantes.Dominio.Service.ICursosService;
+import org.kaven.A41_2024401_gestionestudiantes.persistence.entity.EstudianteCursoId;
 import org.kaven.A41_2024401_gestionestudiantes.persistence.entity.Estudiantes;
 import org.kaven.A41_2024401_gestionestudiantes.persistence.entity.EstudiantesCurso;
 import org.slf4j.Logger;
@@ -85,14 +86,13 @@ public class A412024401GestionestudiantesApplication implements CommandLineRunne
 					logger.info("Ingrese el codigo del Estudiante");
 					int codigo = Integer.parseInt(consola.nextLine());
                     List<EstudiantesCurso> lista = estudiantesCursoService.buscarPorEstudianteId(codigo);
-
                     if (!lista.isEmpty()) {
-                        lista.forEach(ec -> logger.info("Nombre: {} {}, Correo: {}, Curso: {}, Nota: {}",
-                                ec.getEstudiantes().getNombre(),
-                                ec.getEstudiantes().getApellido(),
-                                ec.getEstudiantes().getCorreo(),
-                                ec.getCursos().getNombrecursos(),
-                                ec.getNota()
+                        lista.forEach(estudiantesCurso -> logger.info("Nombre: {} {}, Correo: {}, Curso: {}, Nota: {}",
+                                estudiantesCurso.getEstudiante().getNombre(),
+                                estudiantesCurso.getEstudiante().getApellido(),
+                                estudiantesCurso.getEstudiante().getCorreo(),
+                                estudiantesCurso.getCursos().getNombrecursos(),
+                                estudiantesCurso.getNota()
                         ));
                     } else {
                         logger.info("Estudiante no encontrado");
@@ -101,21 +101,19 @@ public class A412024401GestionestudiantesApplication implements CommandLineRunne
 					logger.info("Ingrese el correo del Estudiante");
 					String correo = consola.nextLine();
                     List<EstudiantesCurso> lista = estudiantesCursoService.buscarPorEstudianteCorreo(correo);
-
                     if (!lista.isEmpty()) {
-                        lista.forEach(ec -> logger.info("Nombre: {} {}, Correo: {}, Curso: {}, Nota: {}",
-                                ec.getEstudiantes().getNombre(),
-                                ec.getEstudiantes().getApellido(),
-                                ec.getEstudiantes().getCorreo(),
-                                ec.getCursos().getNombrecursos(),
-                                ec.getNota()
+                        lista.forEach(estudiantesCurso -> logger.info("Nombre: {} {}, Correo: {}, Curso: {}, Nota: {}",
+                                estudiantesCurso.getEstudiante().getNombre(),
+                                estudiantesCurso.getEstudiante().getApellido(),
+                                estudiantesCurso.getEstudiante().getCorreo(),
+                                estudiantesCurso.getCursos().getNombrecursos(),
+                                estudiantesCurso.getNota()
                         ));
                     } else {
                         logger.info("Estudiante no encontrado");
                     }
-
                 } else {
-                    logger.info("Opción no válida, debe escribir 'id' o 'correo'");
+                    logger.info("No existe la opcion elija ID o Correo");
 				}
 			}
 			case 3 -> {
@@ -132,28 +130,37 @@ public class A412024401GestionestudiantesApplication implements CommandLineRunne
                 estudiante.setApellido(apellido);
                 estudiante.setCorreo(correo);
                 estudianteService.guardarEstudiantes(estudiante);
-
                 logger.info("Estudiante agregado: " + sl + estudiante + sl);
 
-                logger.info("Cursos disponibles:");
-                List<Cursos> cursosDisponibles = cursosService.listarCursos();
-                for (Cursos curso : cursosDisponibles) {
-                    logger.info(curso.getIdcursos() + " - " + curso.getNombrecursos());
-                }
-                logger.info("Ingrese el ID del curso que desea inscribirse:");
-                int idCurso = Integer.parseInt(consola.nextLine());
-                String nombreCursoSeleccionado = "";
-                for (Cursos curso : cursosDisponibles) {
-                    if (curso.getIdcursos() == idCurso) {
-                        nombreCursoSeleccionado = curso.getNombrecursos();
-                        break;
+                boolean seguirInscribiendo;
+                do {
+                    logger.info("Cursos disponibles:");
+                    List<Cursos> cursosDisponibles = cursosService.listarCursos();
+                    for (Cursos curso : cursosDisponibles) {
+                        logger.info(curso.getIdcursos() + " - " + curso.getNombrecursos());
                     }
-                }
-                if (!nombreCursoSeleccionado.isEmpty()) {
-                    logger.info("Te has inscrito al curso: " + nombreCursoSeleccionado);
-                } else {
-                    logger.info("ID de curso no válido.");
-                }
+
+                    logger.info("Ingrese el ID del curso que desea inscribirse:");
+                    int idCurso = Integer.parseInt(consola.nextLine());
+                    Cursos cursoSeleccionado = cursosService.buscarCurso(idCurso);
+
+                    if (cursoSeleccionado != null) {
+                        EstudiantesCurso estCurso = new EstudiantesCurso();
+                        EstudianteCursoId idCompuesto = new EstudianteCursoId(estudiante.getIdestudiantes(), cursoSeleccionado.getIdcursos());
+                        estCurso.setId(idCompuesto);
+                        estCurso.setEstudiante(estudiante);
+                        estCurso.setCursos(cursoSeleccionado);
+                        estCurso.setNota(null);
+                        estudiantesCursoService.guardarEstudiantesCurso(estCurso);
+                        logger.info("Te has inscrito al curso: " + cursoSeleccionado.getNombrecursos());
+                    } else {
+                        logger.info("ID de curso no válido.");
+                    }
+
+                    logger.info("¿Desea inscribirse en otro curso? (si/no):");
+                    String respuesta = consola.nextLine();
+                    seguirInscribiendo = respuesta.equals("si") || respuesta.equals("SI") || respuesta.equals("Si");
+                } while (seguirInscribiendo);
             }
 			case 4 -> {
 				logger.info(sl+"***Modificar los datos de Estudiante***"+sl);
@@ -210,9 +217,9 @@ public class A412024401GestionestudiantesApplication implements CommandLineRunne
                 List<EstudiantesCurso> estudiantesCursos = estudiantesCursoService.listarEstudiantesCurso();
                 estudiantesCursos.forEach(estudiantecurso ->
                         logger.info("Nombre: {} {}, Correo: {}, Curso: {}, Nota: {}",
-                                estudiantecurso.getEstudiantes().getNombre(),
-                                estudiantecurso.getEstudiantes().getApellido(),
-                                estudiantecurso.getEstudiantes().getCorreo(),
+                                estudiantecurso.getEstudiante().getNombre(),
+                                estudiantecurso.getEstudiante().getApellido(),
+                                estudiantecurso.getEstudiante().getCorreo(),
                                 estudiantecurso.getCursos().getNombrecursos(),
                                 estudiantecurso.getNota())
                 );

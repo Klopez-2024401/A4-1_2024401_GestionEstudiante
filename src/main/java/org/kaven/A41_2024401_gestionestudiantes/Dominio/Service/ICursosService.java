@@ -8,4 +8,5 @@ public interface ICursosService {
 
     void guardarCurso(Cursos cursos);
     List<Cursos> listarCursos();
+    Cursos buscarCurso(Integer idCurso);
 }

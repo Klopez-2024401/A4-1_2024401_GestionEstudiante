@@ -19,7 +19,7 @@ public class EstudiantesCurso {
     @ManyToOne
     @MapsId("idestudiantes")
     @JoinColumn(name = "idestudiantes")
-    private Estudiantes estudiantes;
+    private Estudiantes estudiante;
 
     @ManyToOne
     @MapsId("idcursos")

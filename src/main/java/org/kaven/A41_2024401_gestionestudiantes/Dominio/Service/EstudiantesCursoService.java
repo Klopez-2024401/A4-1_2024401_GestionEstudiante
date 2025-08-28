@@ -20,8 +20,18 @@ public class EstudiantesCursoService implements IEstudiantesCursoService{
     }
 
     @Override
-    public EstudiantesCurso buscarPorEstudianteId(Integer codigo) {
-        EstudiantesCurso estudiantesCurso = crud.findById(codigo).orElse(null);
-        return estudiantesCurso;
+    public List<EstudiantesCurso> buscarPorEstudianteId(Integer codigo) {
+        return crud.findByEstudiante_Idestudiantes(codigo);
     }
+
+    @Override
+    public List<EstudiantesCurso> buscarPorEstudianteCorreo(String correo) {
+        return crud.findByEstudiante_Correo(correo);
+    }
+
+    @Override
+    public EstudiantesCurso guardarEstudiantesCurso(EstudiantesCurso estCurso) {
+        return crud.save(estCurso);
+    }
+
 }
