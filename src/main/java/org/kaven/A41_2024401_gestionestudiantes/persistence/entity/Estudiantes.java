@@ -25,7 +25,5 @@ public class Estudiantes {
     private String apellido;
     @Column(name = "correo")
     private String correo;
-    @Column(name = "inscrito")
-    private String inscrito;
 }
 

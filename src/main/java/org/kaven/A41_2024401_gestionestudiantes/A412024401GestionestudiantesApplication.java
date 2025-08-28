@@ -1,10 +1,12 @@
 package org.kaven.A41_2024401_gestionestudiantes;
 
-import org.kaven.A41_2024401_gestionestudiantes.Dominio.Service.CursosService;
-import org.kaven.A41_2024401_gestionestudiantes.Dominio.Service.ICursosService;
+
 import org.kaven.A41_2024401_gestionestudiantes.Dominio.Service.IEstudianteService;
+import org.kaven.A41_2024401_gestionestudiantes.Dominio.Service.IEstudiantesCursoService;
 import org.kaven.A41_2024401_gestionestudiantes.persistence.entity.Cursos;
+import org.kaven.A41_2024401_gestionestudiantes.Dominio.Service.ICursosService;
 import org.kaven.A41_2024401_gestionestudiantes.persistence.entity.Estudiantes;
+import org.kaven.A41_2024401_gestionestudiantes.persistence.entity.EstudiantesCurso;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,10 @@ public class A412024401GestionestudiantesApplication implements CommandLineRunne
 
 	@Autowired
 	private IEstudianteService estudianteService;
+    @Autowired
+    private ICursosService cursosService;
+    @Autowired
+    private IEstudiantesCursoService estudiantesCursoService;
 	private static final Logger logger = LoggerFactory.getLogger(A412024401GestionestudiantesApplication.class);
 	String sl = System.lineSeparator();
 
@@ -53,8 +59,9 @@ public class A412024401GestionestudiantesApplication implements CommandLineRunne
                 3. Agregar nuevo Estudiantes.
                 4. Modificar los datos de Estudiantes.
                 5. Dar de baja a Estudiante.
-                6. Mostar notas de los Cursos de estudiantes.
-                7. Salir.
+                6. Agregar Curso.
+                7. Ver datos completos de los estudiantes.
+                8. Salir.
                 Elija una opcion: \s""");
 		var opcion = Integer.parseInt(consola.nextLine());
 		return opcion;
@@ -77,45 +84,77 @@ public class A412024401GestionestudiantesApplication implements CommandLineRunne
 				if ("id".equalsIgnoreCase(elegir)) {
 					logger.info("Ingrese el codigo del Estudiante");
 					int codigo = Integer.parseInt(consola.nextLine());
-					Estudiantes estudiantes = estudianteService.buscarEstudiantes(codigo);
-					if (estudiantes != null) {
-						logger.info("Estudiante encontrado:" + sl + estudiantes + sl);
-					}else{
-						logger.info("Estudiante no encontrado");
-					}
+                    List<EstudiantesCurso> lista = estudiantesCursoService.buscarPorEstudianteId(codigo);
+
+                    if (!lista.isEmpty()) {
+                        lista.forEach(ec -> logger.info("Nombre: {} {}, Correo: {}, Curso: {}, Nota: {}",
+                                ec.getEstudiantes().getNombre(),
+                                ec.getEstudiantes().getApellido(),
+                                ec.getEstudiantes().getCorreo(),
+                                ec.getCursos().getNombrecursos(),
+                                ec.getNota()
+                        ));
+                    } else {
+                        logger.info("Estudiante no encontrado");
+                    }
 				}else if ("correo".equalsIgnoreCase(elegir)) {
 					logger.info("Ingrese el correo del Estudiante");
 					String correo = consola.nextLine();
-					Estudiantes estudiantes = estudianteService.buscarEstudiantescorreo(correo);
+                    List<EstudiantesCurso> lista = estudiantesCursoService.buscarPorEstudianteCorreo(correo);
 
-					if (estudiantes != null) {
-						logger.info("Estudiante encontrado:" + sl + estudiantes + sl);
-					}else{
-						logger.info("Estudiante no encontrado");
-					}
-				}else{
-					logger.info("Opcion no encontrada debe escribir ID o CORREO SI O SI");
+                    if (!lista.isEmpty()) {
+                        lista.forEach(ec -> logger.info("Nombre: {} {}, Correo: {}, Curso: {}, Nota: {}",
+                                ec.getEstudiantes().getNombre(),
+                                ec.getEstudiantes().getApellido(),
+                                ec.getEstudiantes().getCorreo(),
+                                ec.getCursos().getNombrecursos(),
+                                ec.getNota()
+                        ));
+                    } else {
+                        logger.info("Estudiante no encontrado");
+                    }
+
+                } else {
+                    logger.info("Opción no válida, debe escribir 'id' o 'correo'");
 				}
 			}
 			case 3 -> {
-				logger.info(sl+"***Agregar nuevo Estudiante***"+sl);
-				logger.info("Ingrese el nombre: ");
-				var nombre = consola.nextLine();
-				logger.info("Ingrese el apellido: ");
-				var apellido = consola.nextLine();
-				logger.info("Ingrese el correo: ");
-				var correo = consola.nextLine();
-				logger.info("Ingrese nombre del curso para inscribirse");
-				var inscrito = consola.nextLine();
+                logger.info(sl + "***Agregar nuevo Estudiante***" + sl);
+                logger.info("Ingrese el nombre: ");
+                var nombre = consola.nextLine();
+                logger.info("Ingrese el apellido: ");
+                var apellido = consola.nextLine();
+                logger.info("Ingrese el correo: ");
+                var correo = consola.nextLine();
 
-				var estudiante = new Estudiantes();
-				estudiante.setNombre(nombre);
-				estudiante.setApellido(apellido);
-				estudiante.setCorreo(correo);
-				estudiante.setInscrito(inscrito);
-				estudianteService.guardarEstudiantes(estudiante);
-				logger.info("Estudiante agregado: " + sl + estudiante + sl);
-			}
+                var estudiante = new Estudiantes();
+                estudiante.setNombre(nombre);
+                estudiante.setApellido(apellido);
+                estudiante.setCorreo(correo);
+                estudianteService.guardarEstudiantes(estudiante);
+
+                logger.info("Estudiante agregado: " + sl + estudiante + sl);
+
+                logger.info("Cursos disponibles:");
+                List<Cursos> cursosDisponibles = cursosService.listarCursos();
+                for (Cursos curso : cursosDisponibles) {
+                    logger.info(curso.getIdcursos() + " - " + curso.getNombrecursos());
+                }
+                logger.info("Ingrese el ID del curso que desea inscribirse:");
+                int idCurso = Integer.parseInt(consola.nextLine());
+                String nombreCursoSeleccionado = "";
+                for (Cursos curso : cursosDisponibles) {
+                    if (curso.getIdcursos() == idCurso) {
+                        nombreCursoSeleccionado = curso.getNombrecursos();
+                        break;
+                    }
+                }
+                if (!nombreCursoSeleccionado.isEmpty()) {
+                    logger.info("Te has inscrito al curso: " + nombreCursoSeleccionado);
+                } else {
+                    logger.info("ID de curso no válido.");
+                }
+            }
 			case 4 -> {
 				logger.info(sl+"***Modificar los datos de Estudiante***"+sl);
 				logger.info("Ingrese el codigo del Estudiante");
@@ -128,13 +167,10 @@ public class A412024401GestionestudiantesApplication implements CommandLineRunne
 					var apellido = consola.nextLine();
 					logger.info("Ingrese el correo: ");
 					var correo = consola.nextLine();
-					logger.info("Ingrese el nuevo curso que quiere Inscribirse: ");
-					var inscrito = consola.nextLine();
 
 					estudiante.setNombre(nombre);
 					estudiante.setApellido(apellido);
 					estudiante.setCorreo(correo);
-					estudiante.setInscrito(inscrito);
 					estudianteService.guardarEstudiantes(estudiante);
 					logger.info("Estudiante modificado: " + sl + estudiante + sl);
 				}else{
@@ -154,12 +190,34 @@ public class A412024401GestionestudiantesApplication implements CommandLineRunne
 					logger.info("Estudiantes no encontrado"+ sl + estudiante + sl);
 				}
 			}
-			case 6 ->{
-				logger.info("***Mostar notas de los Cursos de estudiantes.***");
-				List<Cursos> cursos = cursosService.listarCursos();
-				cursos.forEach(cursos -> logger.info(cursos.toString()+sl));
-			}
-			case 7 -> {
+            case 6 ->{
+                logger.info("Ingresar curso existente");
+                logger.info("Ingrese el curso: ");
+                var nombrecursos = consola.nextLine();
+
+                var cursos = new Cursos();
+                cursos.setNombrecursos(nombrecursos);
+
+                try {
+                    cursosService.guardarCurso(cursos);
+                    logger.info("Curso agregado: " + cursos);
+                } catch (IllegalArgumentException e) {
+                    logger.info("Error"+ e.getMessage());
+                }
+            }
+            case 7 -> {
+                logger.info("Listado de Datos completos de estudiantes");
+                List<EstudiantesCurso> estudiantesCursos = estudiantesCursoService.listarEstudiantesCurso();
+                estudiantesCursos.forEach(estudiantecurso ->
+                        logger.info("Nombre: {} {}, Correo: {}, Curso: {}, Nota: {}",
+                                estudiantecurso.getEstudiantes().getNombre(),
+                                estudiantecurso.getEstudiantes().getApellido(),
+                                estudiantecurso.getEstudiantes().getCorreo(),
+                                estudiantecurso.getCursos().getNombrecursos(),
+                                estudiantecurso.getNota())
+                );
+            }
+			case 8 -> {
 				logger.info(sl+"***Salir del programa***"+sl);
 				salir = true;
 			}

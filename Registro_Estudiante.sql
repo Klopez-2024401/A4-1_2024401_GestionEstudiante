@@ -7,25 +7,49 @@ idestudiantes int auto_increment,
 nombre varchar(50),
 apellido varchar(50),
 correo varchar(50),
-inscrito varchar(50),
 constraint pk_estudiantes primary key(idestudiantes)
 );
 
 create table Cursos(
-	idcurso int auto_increment,
-    nota int,
-    idestudiantes int,
-    constraint pk_cursos primary key(idcurso),
-    constraint fk_cursos_estudiantes foreign key (idestudiantes)
-		references Estudiantes(idestudiantes)
+	idcursos int auto_increment,
+	nombrecursos varchar(50) unique,
+    constraint pk_cursos primary key(idcursos)
 );
 
-insert into Estudiantes (nombre, apellido, correo, inscrito) values
-('Alfredo','Perez','AlPerez@gmail.com','Fisica');
+create table EstudianteCurso(
+	idestudiantes int,
+    idcursos int,
+    nota decimal(5,2),
+    constraint pk_estudiantecursos primary key(idestudiantes, idcursos),
+    constraint fk_estudiantecursos_estudiantes foreign key(idestudiantes)
+		references Estudiantes(idestudiantes) on delete cascade,
+	constraint fk_estudiantecursos_cursos foreign key(idcursos) 
+		references Cursos(idcursos) on delete cascade
+);
 
-insert into Cursos(nota, idestudiantes) values
-('57',1);
+insert into Estudiantes (nombre, apellido, correo) values
+('Alfredo','Perez','AlPerez@gmail.com'),
+('Maria','Lopez','mlopez@gmail.com');
+
+insert into Cursos (nombrecursos) values
+('Fisica'), 
+('Matematicas');
+
+insert into EstudianteCurso (idestudiantes, idcursos, nota) values
+(1,1,57.0),  
+(2,2,85.0);
 
 select * from Estudiantes;
+select * from Cursos;
+select * from EstudianteCurso;
 
-select * from 	Cursos;
+select 
+    e.nombre as Nombre,
+    e.apellido as Apellido,
+    e.correo as Correo,
+    c.nombrecursos as Curso,
+    ec.nota as Nota
+from EstudianteCurso ec
+join Estudiantes e on ec.idestudiantes = e.idestudiantes
+join Cursos c on ec.idcursos = c.idcursos;
+

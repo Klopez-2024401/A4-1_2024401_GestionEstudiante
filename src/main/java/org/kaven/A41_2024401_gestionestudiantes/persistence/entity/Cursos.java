@@ -4,7 +4,10 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "Cursos")
+@Table(name = "Cursos",
+    uniqueConstraints = {
+    @UniqueConstraint(name = "uq_nombrecursos", columnNames = "nombrecursos")
+    })
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,11 +20,7 @@ public class Cursos {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idcursos")
     private Integer idcursos;
-    @Column(name = "nota")
-    private Integer nota;
-    @Column(name = "seccion")
-    private String seccion;
-    @Column(name = "idestudiantes")
-    private Integer idestudiantes;
+    @Column(name = "nombrecursos", length = 50, nullable = false, unique = true)
+    private String nombrecursos;
 
 }
