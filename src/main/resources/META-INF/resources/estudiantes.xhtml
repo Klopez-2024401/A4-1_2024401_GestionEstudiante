@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-    <h:html xmlns="http://www.w3.org/1999/xhtml"
-            xmlns:h="http://xmlns.jcp.org/jsf/html"
-            xmlns:f="http://xmlns.jcp.org/jsf/core"
-            xmlns:p="http://primefaces.org/ui">
+<h:html xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:p="http://primefaces.org/ui">
     <h:head>
         <title>Lista de Estudiantes</title>
         <link rel="stylesheet" href="https://unpkg.com/primeflex@latest/primeflex.css"/>
@@ -14,32 +14,33 @@
                 <p:growl id="mensaje_emergente" showDetail="true"/>
                 <div class="card">
                     <p:menubar>
-                        <p:menuitem  value="Inicio" icon="pi pi-fw pi-user"
+                        <p:menuitem value="Inicio" icon="pi pi-fw pi-user"
                                     update=":formulario-estudiantes:tabla-estudiantes"
                                     actionListener="#{indexController.cargarDatos}"/>
-                        <p:menuitem value="Aregar Nuevo Estudiante" icon="pi pi-fw pi-plus"
+                        <p:menuitem value="Agregar Nuevo Estudiante" icon="pi pi-fw pi-plus"
                                     actionListener="#{indexController.agregarEstudiante}"
                                     update=":formulario-modal:ventana-estudiante"
                                     oncomplete="PF('ventanaModalEstudiante').show()"/>
+                        <p:menuitem value="Agregar Curso" icon="pi pi-fx pi-plus"
+                                    actionListener="#{indexController.agregarCurso}"
+                                    update=":formulario-curso:ventana-curso"
+                                    oncomplete="PF('ventanaModalCurso').show()"/>
                     </p:menubar>
                 </div>
+
                 <div class="card">
                     <p:dataTable value="#{indexController.estudiantes}" var="estudiante"
-                                id="tabla-estudiantes" widgetVar="tablaEstudiantes">
+                                 id="tabla-estudiantes" widgetVar="tablaEstudiantes"
+                                 styleClass="p-datatable-striped p-datatable-hoverable-rows">
                         <f:facet name="header">
-                            <div class="flex justify-content-center
-                                        flex-wrap card-container yellow-container">
-                                <div class="flex aling-items-center
-                                                justify-content-center
-                                                w-20rem h-4rem
-                                                bg-yellow-500 font-bold
-                                                text-gray-900 border-round m-2">
-                                    <h3>Gestion de Estudiantes</h3>
+                            <div class="flex justify-content-center flex-wrap card-container">
+                                <div class="flex align-items-center justify-content-center w-full h-4rem bg-yellow-400 font-bold text-gray-900 border-round m-2 shadow-2">
+                                    <h3>Gestión de Estudiantes</h3>
                                 </div>
                             </div>
                         </f:facet>
 
-                        <p:column headerText="ID">
+                        <p:column headerText="ID" sortBy="#{estudiante.idestudiantes}" filterBy="#{estudiante.idestudiantes}">
                             <h:outputText value="#{estudiante.idestudiantes}"/>
                         </p:column>
                         <p:column headerText="NOMBRE">
@@ -52,37 +53,98 @@
                             <h:outputText value="#{estudiante.correo}"/>
                         </p:column>
                         <p:column headerText="OPCIÓN">
-                            <p:commandButton value="Editar" icon="pi pi-pencil" class="ui-button-primary">
+                            <p:commandButton value="Editar" icon="pi pi-pencil"
+                                             class="ui-button-primary mr-2"
+                                             update="formulario-modal:ventana-estudiante"
+                                             process="@this"
+                                             oncomplete="PF('ventanaModalEstudiante').show()">
+                                <f:setPropertyActionListener value="#{estudiante}" target="#{indexController.estudianteSeleccionada}" />
                             </p:commandButton>
-                            <p:commandButton value="Eliminar" icon="pi pi-trash" class="ui-button-danger">
+                            <p:commandButton value="Eliminar" icon="pi pi-trash"
+                                             class="ui-button-danger"
+                                             process="@this"
+                                             oncomplete="PF('VentanaEliminarestudiante').show()">
+                                <f:setPropertyActionListener value="#{estudiante}" target="#{indexController.estudianteSeleccionada}" />
                             </p:commandButton>
                         </p:column>
                     </p:dataTable>
                 </div>
             </h:form>
-            <h:form id="formulario-modal">
-                <p:dialog header="Detalles del Estudiante" showEffect="fade"
-                            modal="true" widgetVar="ventanaModalEstudiante" responsive="true">
-                    <p:outputPanel id="ventana-estudiante" class="ui-fluid">
+
+            <h:form id="formulario-curso">
+                <p:growl id="mensaje_emergente" showDetail="true"/>
+                <p:dialog header="Detalle curso" showEffect="fade"
+                        modal="true" widgetVar="ventanaModalCurso" responsive="true">
+                    <p:outputPanel id="ventana-curso" class="ui-fluid">
                         <div class="field">
-                            <p:outputLabel for="nombre">NOMBRE</p:outputLabel>
-                            <p:inputText  id="nombre" required="true"/>
-                        </div>
-                        <div class="field">
-                            <p:outputLabel for="apellido">APELLIDO</p:outputLabel>
-                            <p:inputText  id="apellido"/>
-                        </div>
-                        <div class="field">
-                            <p:outputLabel for="correo">CORREO</p:outputLabel>
-                            <p:inputText  id="correo" required="true"/>
+                            <p:outputLabel for="nombreCurso">Nombre del Curso</p:outputLabel>
+                            <p:inputText id="nombreCurso" required="true"
+                                         value="#{indexController.cursoSeleccionada.nombre}"/>/>
                         </div>
                     </p:outputPanel>
                     <f:facet name="footer">
-                        <p:commandButton value="Guardar" icon="pi pi-check" class="ui-button-primary"/>
-                        <p:commandButton value="Cancelar" icon="pi pi-times" class="ui-button-primary"
-                                         onclick="PF('ventanaModalEstudiante').hide();" type="button"/>
+                        <p:commandButton value="Guardar" icon="pi pi-check"
+                                         class="ui-button-primary"
+                                         process="ventana-curso @this"
+                                         actionListener="#{indexController.guardarCurso}"
+                                         update="formulario-curso:ventana-curso, formulario-curso:mensaje_emergente"
+                                         oncomplete="PF('ventanaModalCurso').hide()"/>
+                        <p:commandButton value="Cancelar" icon="pi pi-times"
+                                         class="ui-button-secondary"
+                                         onclick="PF('ventanaModalCurso').hide();"
+                                         type="button"/>
                     </f:facet>
                 </p:dialog>
+            </h:form>
+
+            <h:form id="formulario-modal">
+                <p:dialog header="Detalles del Estudiante" showEffect="fade"
+                          modal="true" widgetVar="ventanaModalEstudiante" responsive="true">
+                    <p:outputPanel id="ventana-estudiante" class="ui-fluid">
+                        <div class="field">
+                            <p:outputLabel for="nombre">NOMBRE</p:outputLabel>
+                            <p:inputText id="nombre" required="true"
+                                         value="#{indexController.estudianteSeleccionada.nombre}"/>
+                        </div>
+                        <div class="field">
+                            <p:outputLabel for="apellido">APELLIDO</p:outputLabel>
+                            <p:inputText id="apellido"
+                                         value="#{indexController.estudianteSeleccionada.apellido}"/>
+                        </div>
+                        <div class="field">
+                            <p:outputLabel for="correo">CORREO</p:outputLabel>
+                            <p:inputText id="correo" required="true"
+                                         value="#{indexController.estudianteSeleccionada.correo}"/>
+                        </div>
+                    </p:outputPanel>
+                    <f:facet name="footer">
+                        <p:commandButton value="Guardar" icon="pi pi-check"
+                                         class="ui-button-primary"
+                                         process="ventana-estudiante @this"
+                                         actionListener="#{indexController.guardarEstudiantes}"
+                                         update="formulario-estudiantes:tabla-estudiantes, formulario-estudiantes:mensaje_emergente"
+                                         oncomplete="PF('ventanaModalEstudiante').hide()"/>
+                        <p:commandButton value="Cancelar" icon="pi pi-times"
+                                         class="ui-button-secondary"
+                                         onclick="PF('ventanaModalEstudiante').hide();"
+                                         type="button"/>
+                    </f:facet>
+                </p:dialog>
+
+                <p:confirmDialog widgetVar="VentanaEliminarestudiante" showEffect="fade"
+                                 width="300" message="¿Desea eliminar el Estudiante?"
+                                 header="Confirme su elección" severity="warn">
+                    <p:commandButton value="Sí" icon="pi pi-check"
+                                     class="ui-button-primary"
+                                     process="@this"
+                                     actionListener="#{indexController.eliminarEstudiante}"
+                                     update="formulario-estudiantes:tabla-estudiantes, formulario-estudiantes:mensaje_emergente"
+                                     oncomplete="PF('VentanaEliminarestudiante').hide()"/>
+                    <p:commandButton value="No" icon="pi pi-times"
+                                     class="ui-button-secondary"
+                                     onclick="PF('VentanaEliminarestudiante').hide()"
+                                     type="button"/>
+                </p:confirmDialog>
             </h:form>
         </div>
     </h:body>
