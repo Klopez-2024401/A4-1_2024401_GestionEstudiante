@@ -17,13 +17,10 @@ public class Estudiantes {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "idestudiantes")
+    @Column
     private Integer idestudiantes;
-    @Column(name = "nombre")
     private String nombre;
-    @Column(name = "apellido")
     private String apellido;
-    @Column(name = "correo")
     private String correo;
 }
 

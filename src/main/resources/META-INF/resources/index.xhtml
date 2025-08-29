@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<h:html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+    <title>Bienvenido - Kinvana</title>
+    <link rel="stylesheet" href="https://unpkg.com/primeflex@latest/primeflex.css"/>
+    <style>
+        body {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+        }
+        .bienvenida-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 3rem;
+            text-align: center;
+            box-shadow: 0px 8px 20px rgba(0,0,0,0.4);
+            backdrop-filter: blur(6px);
+        }
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        h2 {
+            font-weight: 300;
+            margin-bottom: 2rem;
+        }
+        .btn-iniciar {
+            font-size: 1.2rem;
+            padding: 1rem 2.5rem;
+            border-radius: 30px;
+        }
+    </style>
+</h:head>
+
+<h:body>
+    <div class="flex justify-content-center align-items-center h-screen">
+        <div class="bienvenida-card">
+            <h1>🎓 Bienvenido a <span style="color:#ffcc00">Kinvana</span></h1>
+            <h2>Sistema de Gestión de Clientes</h2>
+            <p>Administra fácilmente tus clientes con una interfaz moderna y amigable.</p>
+
+            <h:form>
+                <p:commandButton value="🚀 Iniciar"
+                                 action="estudiantes?faces-redirect=true" />
+            </h:form>
+        </div>
+    </div>
+</h:body>
+
+</h:html>
